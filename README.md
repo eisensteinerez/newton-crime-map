@@ -1,4 +1,4 @@
-# Newton Crime Map
+# Newton After Dark
 
 An interactive map of crimes reported in Newton, Massachusetts, built from the Newton Police Department's public weekly incident logs.
 
@@ -7,9 +7,12 @@ An interactive map of crimes reported in Newton, Massachusetts, built from the N
 ## What's here
 
 - `index.html`: the whole website (map, filters, charts). Data is built in.
-- `data/raw_logs/`: crime rows pulled from each weekly police log (one file per week).
+- `data/raw_logs/`: crime rows from the 2023 weekly police logs.
+- `data/crimes25.json`, `data/crimes26.json`: crime rows read (by OCR) from the Oct 2025 – Mar 2026 daily logs.
 - `data/geocache.json`: map coordinates for each address (US Census geocoder, with OpenStreetMap as backup).
-- `scripts/`: the steps that turn the logs into the website.
+- `scripts/`: `ocr.py` reads a scanned daily log PDF, `parse.py` keeps the crimes, `build2.py` geocodes and builds the data, `assemble2.py` writes `index.html`.
+
+Map tiles: OpenFreeMap (free, no key). Map engine: MapLibre GL.
 
 ## Data notes
 
