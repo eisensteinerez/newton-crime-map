@@ -44,8 +44,49 @@ h1 span{display:block;color:var(--sodium);text-shadow:0 0 18px rgba(255,178,63,.
 .search{position:relative}
 .search input{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--edge-2);color:var(--ink);border-radius:12px;padding:12px 44px 12px 14px;font:500 14px var(--f-body)}
 .search input::placeholder{color:var(--ink-3)}
-.search button{position:absolute;right:6px;top:6px;bottom:6px;width:34px;border:0;border-radius:8px;background:var(--sodium);color:#1b1205;cursor:pointer;display:grid;place-items:center}
+.qwrap{position:relative}.qwrap>button{position:absolute;right:6px;top:6px;bottom:6px;width:34px;border:0;border-radius:8px;background:var(--sodium);color:#1b1205;cursor:pointer;display:grid;place-items:center}
 .search .msg{font-size:12px;color:var(--ink-3);margin-top:6px;min-height:1em}
+.chipsq{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chipsq button{border:1px solid var(--edge-2);background:transparent;color:var(--ink-2);border-radius:999px;padding:3px 10px;font:600 11.5px var(--f-body);cursor:pointer}
+.chipsq button:hover{color:var(--ink);border-color:var(--sodium)}
+.results{margin-top:10px;border:1px solid var(--edge-2);border-radius:12px;background:var(--glass-2);overflow:hidden}
+.results .rh{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;font:700 10.5px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);border-bottom:1px solid var(--edge)}
+.results .rh button{font:600 11.5px var(--f-body);letter-spacing:0;text-transform:none}
+.results .rl{max-height:300px;overflow-y:auto}
+.res{display:grid;grid-template-columns:8px 1fr auto;gap:2px 10px;align-items:center;width:100%;padding:9px 12px;border:0;border-bottom:1px solid var(--edge);background:transparent;color:var(--ink);text-align:left;cursor:pointer;font:inherit}
+.res:hover,.res:focus-visible{background:rgba(255,178,63,.08)}
+.res i{width:8px;height:8px;border-radius:50%;grid-row:span 2}
+.res b{font:600 13px var(--f-body)}
+.res small{grid-column:2;font:400 11.5px var(--f-mono);color:var(--ink-3)}
+.res em{grid-row:span 2;font:500 11px var(--f-mono);font-style:normal;color:var(--sodium);text-align:right}
+.res mark{background:rgba(255,178,63,.28);color:inherit;border-radius:2px}
+.res.addr b{color:var(--sodium)}
+/* detail drawer */
+.detail{position:fixed;z-index:8;top:calc(16px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));width:360px;max-height:calc(100% - 152px);overflow-y:auto;padding:0;animation:slidein .35s ease-out}
+.detail[hidden]{display:none}
+@keyframes slidein{from{transform:translateX(30px);opacity:0}}
+.detail .band{height:6px;background:var(--col);box-shadow:0 0 24px var(--col)}
+.detail .in{padding:16px 18px 18px;display:flex;flex-direction:column;gap:14px}
+.detail .x{position:absolute;right:10px;top:14px;border:0;background:rgba(255,255,255,.06);color:var(--ink-2);width:30px;height:30px;border-radius:50%;font-size:18px;cursor:pointer}
+.detail .kicker{font:700 10.5px var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--col)}
+.detail h2{margin:4px 0 0;font-family:var(--f-display);font-weight:900;font-size:40px;line-height:.9;text-transform:uppercase;padding-right:30px;text-wrap:balance}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--edge);border:1px solid var(--edge);border-radius:12px;overflow:hidden}
+.facts div{background:var(--glass-2);padding:10px 12px;min-width:0}
+.facts span{display:block;font:700 9.5px var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-bottom:3px}
+.facts b{font:600 13.5px var(--f-body);display:block}
+.facts .wide{grid-column:span 2}
+.summary{font-size:14px;line-height:1.55;color:var(--ink)}
+.summary .what{display:block;color:var(--ink-2);font-size:13px;margin-top:8px}
+.detail h4{margin:0 0 6px;font:700 10.5px var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.mini{display:flex;flex-direction:column}
+.mini button{display:grid;grid-template-columns:8px 1fr auto;gap:10px;align-items:center;border:0;border-top:1px solid var(--edge);background:transparent;color:var(--ink);padding:7px 2px;text-align:left;cursor:pointer;font:500 12.5px var(--f-body)}
+.mini button:hover{background:rgba(255,255,255,.04)}
+.mini i{width:7px;height:7px;border-radius:50%}
+.mini small{font:400 11px var(--f-mono);color:var(--ink-3)}
+.dnav{display:flex;gap:8px}
+.dnav button{flex:1;border:1px solid var(--edge-2);background:transparent;color:var(--ink);border-radius:10px;padding:8px;font:600 12.5px var(--f-body);cursor:pointer}
+.dnav button:hover{border-color:var(--sodium)}
+@media (max-width:720px){.detail{left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));width:auto;top:auto;bottom:calc(12px + env(safe-area-inset-bottom,0px));max-height:70vh}}
 .big{display:flex;align-items:flex-end;gap:14px}
 .big b{font-family:var(--f-display);font-weight:800;font-size:72px;line-height:.8;font-variant-numeric:tabular-nums;color:var(--ink)}
 .big div{padding-bottom:4px;font-size:12.5px;color:var(--ink-2);line-height:1.35}
@@ -174,10 +215,12 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px so
       <p id="lede">Every crime the Newton Police logged, stacked on the streets where it happened. Tilt the city, replay the season, or check your own block.</p>
     </header>
 
-    <form class="search" id="searchForm" autocomplete="off">
-      <input id="q" type="search" placeholder="Check an address, e.g. 300 Walnut St" aria-label="Address to check">
-      <button type="submit" aria-label="Check address"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
-      <div class="msg" id="qmsg">Or tap anywhere on the map.</div>
+    <form class="search" id="searchForm" autocomplete="off" role="search">
+      <div class="qwrap"><input id="q" type="search" placeholder="Search a street, crime, village or date" aria-label="Search incidents" aria-controls="results">
+      <button type="submit" aria-label="Search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button></div>
+      <div class="msg" id="qmsg">Try “Boylston”, “car break-in”, “Waban” or “Jan 6”.</div>
+      <div class="chipsq" id="quick"></div>
+      <div class="results" id="results" hidden></div>
     </form>
 
     <section class="big"><b id="total">0</b><div><span id="totalLbl">crimes shown</span><br><strong id="topType">–</strong> is the most common</div></section>
@@ -249,6 +292,22 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px so
   <div class="verdict" id="spotV"></div>
   <ul id="spotL"></ul>
 </div>
+<aside class="detail glass" id="detail" hidden aria-label="Incident details" tabindex="-1">
+  <div class="band"></div>
+  <button class="x" id="detX" aria-label="Close details">×</button>
+  <div class="in">
+    <div><div class="kicker" id="detK"></div><h2 id="detT"></h2></div>
+    <div class="facts">
+      <div><span>Date</span><b id="detD"></b></div>
+      <div><span>Time</span><b id="detH"></b></div>
+      <div class="wide"><span>Where</span><b id="detW"></b></div>
+    </div>
+    <div class="summary" id="detS"></div>
+    <div><h4 id="detBlkH">Same block</h4><div class="mini" id="detBlk"></div></div>
+    <div><h4>Same day nearby</h4><div class="mini" id="detDay"></div></div>
+    <div class="dnav"><button id="detPrev">← Earlier call</button><button id="detNext">Later call →</button></div>
+  </div>
+</aside>
 <div class="tip" id="tip" hidden></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.min.js"></script>
@@ -344,12 +403,15 @@ ready.then(() => {
   map.addLayer({id: 'dots', type: 'circle', source: 'pts', paint: {'circle-radius': ['interpolate', ['linear'], ['zoom'], 11, 1.8, 16, 5.5], 'circle-color': ['get', 'col'], 'circle-stroke-color': '#070c17', 'circle-stroke-width': .8}});
   map.addLayer({id: 'pulse', type: 'circle', source: 'pulse', paint: {'circle-radius': ['get', 'r'], 'circle-color': 'rgba(0,0,0,0)', 'circle-stroke-color': ['get', 'col'], 'circle-stroke-width': 2, 'circle-stroke-opacity': ['get', 'o'], 'circle-pitch-alignment': 'map'}});
   map.addLayer({id: 'pulse-core', type: 'circle', source: 'pulse', paint: {'circle-radius': 4, 'circle-color': ['get', 'col'], 'circle-opacity': ['get', 'o'], 'circle-blur': .3}});
+  map.addSource('sel', {type: 'geojson', data: {type: 'FeatureCollection', features: []}});
+  map.addLayer({id: 'sel-ring', type: 'circle', source: 'sel', paint: {'circle-radius': ['interpolate', ['linear'], ['zoom'], 11, 6, 16, 16], 'circle-color': 'rgba(0,0,0,0)', 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 2.5}});
+  map.addLayer({id: 'sel-dot', type: 'circle', source: 'sel', paint: {'circle-radius': ['interpolate', ['linear'], ['zoom'], 11, 3, 16, 7], 'circle-color': ['get', 'col'], 'circle-stroke-color': '#070c17', 'circle-stroke-width': 1.5}});
   map.addLayer({id: 'spot-fill', type: 'fill', source: 'spot', paint: {'fill-color': '#4d8dff', 'fill-opacity': .1}});
   map.addLayer({id: 'spot-line', type: 'line', source: 'spot', paint: {'line-color': '#7fb0ff', 'line-width': 2}});
   map.addSource('vlabels', {type: 'geojson', data: {type: 'FeatureCollection', features: Object.entries(VILLAGES).map(([n, ll]) => ({type: 'Feature', properties: {n: n.toUpperCase()}, geometry: {type: 'Point', coordinates: [ll[1], ll[0]]}}))}});
   map.addLayer({id: 'vlabels', type: 'symbol', source: 'vlabels', maxzoom: 14.5, layout: {'text-field': ['get', 'n'], 'text-font': labelFont, 'text-size': 12, 'text-letter-spacing': .2, 'text-allow-overlap': false},
     paint: {'text-color': '#ffd38a', 'text-halo-color': 'rgba(7,12,23,.9)', 'text-halo-width': 1.6}});
-  map.on('click', 'dots', e => { e.preventDefault(); const r = ALL[e.features[0].properties.i]; showPop(r); });
+  map.on('click', 'dots', e => { e.preventDefault(); openDetail(ALL[e.features[0].properties.i], false); });
   map.on('click', 'hex3d', e => { if (state.view !== '3d') return; e.preventDefault(); openSpot(e.lngLat.lat, e.lngLat.lng); });
   map.on('click', e => { if (e.defaultPrevented) return; openSpot(e.lngLat.lat, e.lngLat.lng); });
   ['dots', 'hex3d'].forEach(id => { map.on('mouseenter', id, () => map.getCanvas().style.cursor = 'pointer'); map.on('mouseleave', id, () => map.getCanvas().style.cursor = ''); });
@@ -397,8 +459,61 @@ function renderSpot(list) {
 }
 $('#spotX').onclick = () => { state.spot = null; renderSpot([]); };
 document.querySelectorAll('#radii button').forEach(b => b.onclick = () => { state.radius = +b.dataset.r; document.querySelectorAll('#radii button').forEach(x => x.setAttribute('aria-pressed', x === b)); renderSpot(current()); });
-$('#searchForm').addEventListener('submit', async e => {
+/* ---------- search ---------- */
+const MONTHS = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+const SYN = {'car': 'Car crime', 'auto': 'Car crime', 'vehicle': 'Car crime', 'shoplift': 'Shoplifting', 'steal': 'Theft', 'stolen': 'Theft', 'theft': 'Theft', 'break': 'Burglary', 'burglar': 'Burglary', 'scam': 'Fraud & scams', 'fraud': 'Fraud & scams', 'fight': 'Assault & fights', 'assault': 'Assault & fights', 'gun': 'Assault & fights', 'shot': 'Assault & fights', 'graffiti': 'Vandalism', 'vandal': 'Vandalism', 'threat': 'Harassment', 'harass': 'Harassment', 'drug': 'Trespass & drugs', 'trespass': 'Trespass & drugs'};
+ALL.forEach(r => { r.hay = `${r.t} ${r.c} ${r.loc} ${r.v} ${fmtD(r.dt, {weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'})} ${fmtD(r.dt)}`.toLowerCase(); });
+function dateQuery(q) {
+  const m = q.match(/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s*(\d{1,2})?(?:,?\s*(\d{4}))?\b/i);
+  if (m) return r => r.dt.getMonth() === MONTHS.indexOf(m[1].toLowerCase().slice(0, 3)) && (!m[2] || r.dt.getDate() === +m[2]) && (!m[3] || r.dt.getFullYear() === +m[3]);
+  const n = q.match(/\b(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\b/);
+  if (n) return r => r.dt.getMonth() + 1 === +n[1] && r.dt.getDate() === +n[2] && (!n[3] || r.dt.getFullYear() % 100 === +n[3] % 100);
+  const y = q.match(/^\s*(20\d\d)\s*$/); if (y) return r => r.dt.getFullYear() === +y[1];
+  return null;
+}
+function search(q) {
+  q = q.trim().toLowerCase(); if (q.length < 2) return null;
+  const df = dateQuery(q);
+  const cat = Object.entries(SYN).find(([k]) => q.includes(k))?.[1];
+  const words = q.replace(/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s*\d{0,2}(,?\s*\d{4})?\b/g, '').replace(/\d{1,2}\/\d{1,2}(\/\d{2,4})?/g, '').split(/\s+/).filter(w => w.length > 1 && !SYN[w] && !Object.keys(SYN).some(k => w.startsWith(k)));
+  let res = ALL.filter(r => (!df || df(r)) && (!cat || r.c === cat || r.t === cat) && words.every(w => r.hay.includes(w)));
+  if (!df && !cat && !words.length) res = [];
+  return res.sort((a, b) => b.dt - a.dt);
+}
+const hl = (s, q) => { let out = esc(s); q.trim().split(/\s+/).filter(w => w.length > 2).forEach(w => { out = out.replace(new RegExp('(' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig'), '<mark>$1</mark>'); }); return out; };
+let lastRes = [];
+function renderResults() {
+  const q = $('#q').value, res = search(q), box = $('#results');
+  if (!res) { box.hidden = true; return; }
+  lastRes = res; box.hidden = false;
+  const looksAddr = /^\d+\s+\w/.test(q.trim());
+  box.innerHTML = `<div class="rh"><span>${res.length.toLocaleString()} match${res.length === 1 ? '' : 'es'}</span>${res.length ? '<button class="link" id="showOnMap">Show on map</button>' : ''}</div><div class="rl">` +
+    (looksAddr ? `<button class="res addr" data-addr="1"><i style="background:var(--sodium)"></i><b>Check this address on the map</b><em>↵</em><small>${esc(q)}, Newton</small></button>` : '') +
+    res.slice(0, 40).map(r => `<button class="res" data-i="${r.i}"><i style="background:${col(r.c)}"></i><b>${hl(r.t, q)}</b><em>${fmtD(r.dt)}<br>${r.dt.getFullYear()}</em><small>${hl(r.loc, q)} · ${hl(r.v, q)}</small></button>`).join('') +
+    (!res.length && !looksAddr ? `<div style="padding:12px;color:var(--ink-3);font-size:12.5px">No matches. Try a street name, a crime type like “break-in”, or a date like “Dec 24”.</div>` : '') + '</div>';
+  box.querySelectorAll('.res[data-i]').forEach(b => b.onclick = () => openDetail(ALL[+b.dataset.i], true));
+  const ad = box.querySelector('.res.addr'); if (ad) ad.onclick = () => geocode(q);
+  const sm = $('#showOnMap'); if (sm) sm.onclick = () => showMatches(res);
+}
+function showMatches(res) {
+  if (!res.length) return;
+  const per = res[0].p; if (per !== state.period) setPeriod(per);
+  const lons = res.map(r => r.lon), lats = res.map(r => r.lat);
+  map.getSource('sel')?.setData({type: 'FeatureCollection', features: res.filter(r => r.p === per).map(r => ({type: 'Feature', properties: {col: col(r.c)}, geometry: {type: 'Point', coordinates: [r.lon, r.lat]}}))});
+  if (res.length === 1) map.flyTo({center: [lons[0], lats[0]], zoom: 16, duration: 1400});
+  else map.fitBounds([[Math.min(...lons), Math.min(...lats)], [Math.max(...lons), Math.max(...lats)]], {padding: {top: 80, bottom: 160, left: 420, right: 80}, maxZoom: 16, duration: 1400, pitch: 40});
+}
+let qt; $('#q').addEventListener('input', () => { clearTimeout(qt); qt = setTimeout(renderResults, 120); });
+$('#quick').innerHTML = ['Boylston St', 'car break-in', 'shoplifting', 'Newton Centre', 'Dec 24', 'after midnight'].map(s => `<button type="button">${s}</button>`).join('');
+$('#quick').querySelectorAll('button').forEach(b => b.onclick = () => {
+  if (b.textContent === 'after midnight') { state.hours = new Set([0, 1, 2, 3, 4, 5]); update(); $('#qmsg').textContent = 'Showing crimes logged between midnight and 6am.'; return; }
+  $('#q').value = b.textContent; renderResults(); });
+$('#searchForm').addEventListener('submit', e => {
   e.preventDefault(); const q = $('#q').value.trim(); if (!q) return;
+  const res = search(q) || [];
+  if (res.length) showMatches(res); else geocode(q);
+});
+async function geocode(q) {
   $('#qmsg').textContent = 'Looking that up…';
   try {
     const u = 'https://nominatim.openstreetmap.org/search?' + new URLSearchParams({q: q + ', Newton, Massachusetts', format: 'json', limit: 1, viewbox: '-71.28,42.38,-71.14,42.27', bounded: 1});
@@ -409,7 +524,75 @@ $('#searchForm').addEventListener('submit', async e => {
     map.flyTo({center: [lon, lat], zoom: 15.4, pitch: 50, duration: 1800});
     openSpot(lat, lon, q.replace(/\b\w/g, c => c.toUpperCase()));
   } catch (err) { $('#qmsg').textContent = "Address lookup isn't available here. Tap the map instead."; }
-});
+}
+
+/* ---------- incident detail ---------- */
+const WHAT = {
+  'Larceny': 'Someone reported property stolen without a break-in, like a package, wallet or item left outside.',
+  'Shoplifting': 'A store reported merchandise taken without paying.',
+  'Bike theft': 'A bicycle was reported stolen.',
+  'Check fraud larceny': 'Money was taken using a stolen, altered or forged check.',
+  'Attempted larceny': 'Someone tried to steal property but did not get away with it.',
+  'Car break-in': 'Someone broke into a parked vehicle, usually to take what was inside.',
+  'Theft from car': 'Items were taken from a vehicle, often one left unlocked.',
+  'Stolen plate': 'A license plate was taken off a vehicle.',
+  'Stolen car parts': 'Parts were taken off a vehicle, such as a catalytic converter or wheels.',
+  'Stolen car': 'A vehicle was reported stolen.',
+  'Break-in': 'A home, garage or business was broken into. It was reported after it happened.',
+  'Break-in in progress': 'A caller reported a break-in happening at that moment.',
+  'Attempted break-in': 'Someone tried to get into a building but did not get inside.',
+  'Fraud / scam': 'A resident reported a scam or fraud, often by phone, email or online. It is logged at the victim’s address, not where the scammer was.',
+  'Vandalism': 'Property was damaged or defaced, such as a broken window, graffiti or a keyed car.',
+  'Vandalism, city property': 'City property, like a sign, park or school, was damaged.',
+  'Assault & battery': 'A person was physically attacked.',
+  'Assault & battery (reported)': 'Someone reported an assault that had already happened.',
+  'Assault & battery, arrest': 'Police responded to an assault and made an arrest.',
+  'Indecent assault': 'An unwanted sexual touching was reported.',
+  'Assault w/ dangerous weapon': 'An assault involving a weapon was reported.',
+  'Assault': 'An assault was reported.',
+  'Fight / disorderly': 'Police were called about a fight or someone acting disorderly in public.',
+  'Shots heard': 'A caller reported hearing what sounded like gunshots. Many of these turn out to be fireworks or cars backfiring.',
+  'Stabbing / gunshot': 'A stabbing or gunshot injury was reported, with medical help dispatched.',
+  'Robbery': 'Property was taken from a person by force or threat.',
+  'Threats': 'Someone reported being threatened, in person, by phone or online.',
+  'Harassment': 'Someone reported repeated unwanted contact or harassment.',
+  'Trespassing': 'Someone was reported on property where they were not allowed.',
+  'Drugs': 'Police logged a drug-related incident.'
+};
+const partOfDay = h => h < 5 ? 'in the middle of the night' : h < 12 ? 'in the morning' : h < 17 ? 'in the afternoon' : h < 21 ? 'in the evening' : 'late at night';
+const ampm = (h, m) => `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`;
+let detailR = null;
+function openDetail(r, fly) {
+  detailR = r; if (r.p !== state.period) setPeriod(r.p);
+  const d = $('#detail'); d.hidden = false; d.style.setProperty('--col', col(r.c));
+  $('#detK').textContent = r.c; $('#detT').textContent = r.t;
+  $('#detD').textContent = fmtD(r.dt, {weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'});
+  $('#detH').textContent = `${ampm(r.h, r.m)}`;
+  $('#detW').textContent = `${r.loc}, ${r.v}`;
+  const sameBlk = ALL.filter(x => x !== r && x.loc === r.loc && x.p === r.p).sort((a, b) => b.dt - a.dt);
+  const blkTop = Object.entries(sameBlk.reduce((o, x) => (o[x.t] = (o[x.t] || 0) + 1, o), {})).sort((a, b) => b[1] - a[1])[0];
+  const sameDay = ALL.filter(x => x !== r && x.day === r.day).map(x => ({x, d: miles(r.lat, r.lon, x.lat, x.lon)})).filter(o => o.d < 1).sort((a, b) => a.d - b.d).slice(0, 5);
+  const vTot = ALL.filter(x => x.v === r.v && x.p === r.p).length;
+  $('#detS').innerHTML = `${esc(article(r.t))} ${esc(r.t.toLowerCase())} was logged ${partOfDay(r.h)} on ${fmtD(r.dt, {weekday: 'long', month: 'long', day: 'numeric'})} at ${ampm(r.h, r.m)}, ${/^\d/.test(r.loc) ? 'on the' : 'on'} ${esc(r.loc)} in ${esc(r.v)}. ` +
+    (sameBlk.length ? `This block had ${sameBlk.length} other crime report${sameBlk.length === 1 ? '' : 's'} in this period${blkTop ? `, most often ${esc(blkTop[0].toLowerCase())}` : ''}. ` : `It was the only crime report on this block in this period. `) +
+    `${esc(r.v)} had ${vTot} reports in total.` + `<span class="what">${esc(WHAT[r.t] || 'A crime was reported to police.')}</span>`;
+  $('#detBlkH').textContent = sameBlk.length ? `Same block · ${sameBlk.length} other` : 'Same block';
+  const mini = (arr, f) => arr.length ? arr.map(f).join('') : '<small style="color:var(--ink-3);padding:6px 2px;display:block">None.</small>';
+  $('#detBlk').innerHTML = mini(sameBlk.slice(0, 5), x => `<button data-i="${x.i}"><i style="background:${col(x.c)}"></i><span>${esc(x.t)}</span><small>${fmtD(x.dt)} ${x.dt.getFullYear()}</small></button>`);
+  $('#detDay').innerHTML = mini(sameDay, o => `<button data-i="${o.x.i}"><i style="background:${col(o.x.c)}"></i><span>${esc(o.x.t)} · ${esc(o.x.loc)}</span><small>${o.d < .1 ? 'next door' : o.d.toFixed(1) + ' mi'}</small></button>`);
+  d.querySelectorAll('.mini button[data-i]').forEach(b => b.onclick = () => openDetail(ALL[+b.dataset.i], true));
+  map.getSource('sel')?.setData({type: 'FeatureCollection', features: [{type: 'Feature', properties: {col: col(r.c)}, geometry: {type: 'Point', coordinates: [r.lon, r.lat]}}]});
+  if (fly) map.flyTo({center: [r.lon, r.lat], zoom: 16.3, pitch: 55, duration: 1500, offset: innerWidth > 720 ? [-120, 0] : [0, -120]});
+}
+const article = s => /^[aeiou]/i.test(s) ? 'An' : 'A';
+function stepDetail(dir) {
+  if (!detailR) return; const list = ALL.filter(x => x.p === detailR.p).sort((a, b) => a.dt - b.dt); const k = list.indexOf(detailR) + dir;
+  if (list[k]) openDetail(list[k], true);
+}
+$('#detPrev').onclick = () => stepDetail(-1); $('#detNext').onclick = () => stepDetail(1);
+$('#detX').onclick = () => { $('#detail').hidden = true; detailR = null; map.getSource('sel')?.setData({type: 'FeatureCollection', features: []}); };
+addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#detail').hidden) $('#detX').click(); if (!$('#detail').hidden && document.activeElement?.tagName !== 'INPUT') { if (e.key === 'ArrowLeft') stepDetail(-1); if (e.key === 'ArrowRight') stepDetail(1); } });
+function setPeriod(p) { stopPlay(); state.period = p; state.range = null; document.querySelectorAll('#dsSeg button').forEach(x => x.setAttribute('aria-pressed', x.dataset.p === p)); update(); }
 
 /* ---------- tooltip ---------- */
 const tip = $('#tip');
@@ -456,7 +639,7 @@ function renderVillages(list) {
 function renderTape(list, fresh) {
   const show = list.slice(-60).reverse();
   $('#tape').innerHTML = show.map((r, k) => `<button class="line${fresh && k < fresh ? ' fresh' : ''}" data-i="${r.i}" style="--col:${col(r.c)}"><span class="tm">${fmtT(r.h, r.m)}<br><span style="color:var(--ink-3)">${fmtD(r.dt)}</span></span><span class="ty">${esc(r.t)}</span><span class="ad">${esc(r.loc)}</span></button>`).join('') || '<p style="padding:14px;color:var(--ink-3);font-size:12.5px">Quiet. Nothing matches these filters.</p>';
-  document.querySelectorAll('.line').forEach(b => b.onclick = () => { const r = ALL[+b.dataset.i]; map.flyTo({center: [r.lon, r.lat], zoom: 16.5, pitch: 55, duration: 1400}); showPop(r); });
+  document.querySelectorAll('.line').forEach(b => b.onclick = () => { const r = ALL[+b.dataset.i]; openDetail(r, true); });
   $('#scanCount').textContent = `${list.length.toLocaleString()} calls`;
 }
 /* timeline sparkline with brush */
@@ -549,7 +732,7 @@ $('#vdots').onclick = () => { state.view = 'dots'; save(); setView(); };
 $('#allCats').onclick = () => { state.cats = new Set(CATS.map(c => c[0])); update(); };
 $('#noFraud').onclick = () => { state.cats.delete('Fraud & scams'); update(); };
 $('#dsSeg').innerHTML = PERIODS.map(p => `<button data-p="${p.id}" aria-pressed="${p.id === state.period}">${esc(p.short)}</button>`).join('');
-document.querySelectorAll('#dsSeg button').forEach(b => b.onclick = () => { stopPlay(); state.period = b.dataset.p; state.range = null; document.querySelectorAll('#dsSeg button').forEach(x => x.setAttribute('aria-pressed', x === b)); update(); });
+document.querySelectorAll('#dsSeg button').forEach(b => b.onclick = () => setPeriod(b.dataset.p));
 $('#wave').innerHTML = Array.from({length: 40}, (_, i) => `<i style="animation-delay:${(i * 97 % 1100) / 1000}s"></i>`).join('');
 $('#src').textContent = DATA.source;
 $('#tag').textContent = `Newton, MA · ${ALL.length.toLocaleString()} crimes from police logs`;
