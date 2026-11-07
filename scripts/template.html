@@ -1,0 +1,433 @@
+<title>Newton Crime Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/*__LEAFLET_CSS__*/
+/*__MC_CSS__*/
+/* Layout: a dispatch-board split. Control rail on the left, the city map filling the right; stacks to one column on phones. */
+:root{
+  --bg:#eef2f6; --panel:#ffffff; --ink:#122033; --ink-2:#4a5a70; --ink-3:#7c8a9d;
+  --line:#d8e0ea; --chip:#f3f6fa; --accent:#1d5fd1; --accent-ink:#ffffff; --siren:#d23b3b;
+  --boundary:#1d5fd1; --mapbg:#e4eaf1;
+  --c1:#2a78d6; --c2:#eb6834; --c3:#1baf7a; --c4:#eda100; --c5:#e87ba4; --c6:#008300; --c7:#6250d6; --c8:#e34948;
+  --f-display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0c121b; --panel:#131c28; --ink:#e8eef6; --ink-2:#a9b6c7; --ink-3:#74839a;
+  --line:#243245; --chip:#1a2533; --accent:#5b93f0; --accent-ink:#0c121b; --siren:#ef6b6b;
+  --boundary:#7aa8f5; --mapbg:#101824;
+  --c1:#3987e5; --c2:#d95926; --c3:#199e70; --c4:#c98500; --c5:#d55181; --c6:#2f9a2f; --c7:#9085e9; --c8:#e66767;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0c121b; --panel:#131c28; --ink:#e8eef6; --ink-2:#a9b6c7; --ink-3:#74839a;
+  --line:#243245; --chip:#1a2533; --accent:#5b93f0; --accent-ink:#0c121b; --siren:#ef6b6b;
+  --boundary:#7aa8f5; --mapbg:#101824;
+  --c1:#3987e5; --c2:#d95926; --c3:#199e70; --c4:#c98500; --c5:#d55181; --c6:#2f9a2f; --c7:#9085e9; --c8:#e66767;
+  color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.45}
+.app{display:grid;grid-template-columns:minmax(320px,400px) 1fr;height:100%;min-height:0}
+.rail{overflow-y:auto;background:var(--panel);border-right:1px solid var(--line);
+  padding-block:20px 28px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:18px;display:flex;flex-direction:column;gap:22px;min-width:0}
+.rail>*{flex:none}
+.stage{position:relative;min-width:0;min-height:0}
+#map{position:absolute;inset:0;background:var(--mapbg)}
+header .eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);display:flex;align-items:center;gap:8px}
+.beacon{width:8px;height:8px;border-radius:50%;background:var(--siren);box-shadow:0 0 0 0 var(--siren);animation:pulse 2.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--siren) 60%,transparent)}70%{box-shadow:0 0 0 9px transparent}100%{box-shadow:0 0 0 0 transparent}}
+h1{font-family:var(--f-display);font-stretch:72%;font-weight:850;font-size:40px;line-height:.95;letter-spacing:-.01em;margin:6px 0 8px;text-transform:uppercase;text-wrap:balance}
+.lede{color:var(--ink-2);margin:0;max-width:60ch}
+h2{font-family:var(--f-display);font-stretch:85%;font-weight:750;font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 10px;color:var(--ink);display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+h2 small{font-family:var(--f-body);font-weight:500;letter-spacing:0;text-transform:none;color:var(--ink-3);font-size:12px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.stat{background:var(--panel);padding:10px 12px;min-width:0}
+.stat b{display:block;font-family:var(--f-display);font-stretch:80%;font-weight:800;font-size:26px;line-height:1.05;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat b.sm{font-size:17px;line-height:1.5}
+.stat span{font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em}
+.seg{display:flex;background:var(--chip);border:1px solid var(--line);border-radius:9px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:transparent;color:var(--ink-2);font:600 12.5px var(--f-body);padding:7px 6px;border-radius:6px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.seg button:hover{color:var(--ink)}
+button:focus-visible,input:focus-visible,.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.chip{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--chip);color:var(--ink);border-radius:8px;padding:7px 9px;font:500 12.5px var(--f-body);cursor:pointer;text-align:left;min-width:0}
+.chip .dot{flex:none;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;color:#fff;font:700 10px var(--f-mono)}
+.chip .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip .n{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.chip[aria-pressed="false"]{opacity:.42}
+.chip[aria-pressed="false"] .dot{background:var(--ink-3)!important}
+.row-actions{display:flex;gap:10px;margin-top:8px}
+.link{background:none;border:0;padding:0;color:var(--accent);font:600 12px var(--f-body);cursor:pointer}
+.chart{width:100%;display:block;overflow:visible}
+.chart text{fill:var(--ink-3);font:10.5px var(--f-mono)}
+.chart .bar{cursor:pointer}
+.weekhead{display:flex;gap:8px;align-items:center}
+.play{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--chip);color:var(--ink);border-radius:999px;padding:4px 11px;font:600 12px var(--f-body);cursor:pointer}
+.play svg{width:10px;height:10px;fill:currentColor}
+.villages{display:flex;flex-direction:column;gap:3px}
+.vrow{display:grid;grid-template-columns:118px 1fr 34px;align-items:center;gap:8px;border:0;background:none;padding:3px 4px;border-radius:6px;cursor:pointer;color:var(--ink);font:500 12.5px var(--f-body);text-align:left}
+.vrow:hover{background:var(--chip)}
+.vrow .track{height:10px;background:var(--chip);border-radius:0 4px 4px 0;overflow:hidden}
+.vrow .fill{height:100%;background:var(--accent);border-radius:0 4px 4px 0;transition:width .35s ease}
+.vrow .n{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-2);text-align:right;font-variant-numeric:tabular-nums}
+.feed{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.inc{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;padding:9px 2px;border-bottom:1px solid var(--line);cursor:pointer;background:none;border-left:0;border-right:0;border-top:0;text-align:left;color:var(--ink);font:inherit}
+.inc:hover{background:var(--chip)}
+.inc .dot{grid-row:span 2;width:10px;height:10px;border-radius:50%;margin-top:5px}
+.inc .t{font-weight:600;font-size:13px}
+.inc .meta{font-family:var(--f-mono);font-size:11px;color:var(--ink-3)}
+.note{font-size:12px;color:var(--ink-3);line-height:1.5;border-top:1px solid var(--line);padding-top:14px}
+.note p{margin:0 0 8px}
+.note a{color:var(--accent)}
+/* map overlays */
+.overlay{position:absolute;z-index:500;background:color-mix(in srgb,var(--panel) 94%,transparent);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:12px;box-shadow:0 6px 24px rgba(10,20,40,.14);color:var(--ink)}
+.hint{top:calc(14px + env(safe-area-inset-top,0px));left:calc(60px + env(safe-area-inset-left,0px));padding:8px 12px;font-size:12.5px;display:flex;gap:8px;align-items:center}
+.hint kbd{font-family:var(--f-mono);font-size:11px;background:var(--chip);border:1px solid var(--line);border-radius:4px;padding:1px 5px}
+.check{right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(26px + env(safe-area-inset-bottom,0px));width:300px;max-width:calc(100% - 28px);padding:14px 16px}
+.check h3{margin:0 0 2px;font-family:var(--f-display);font-stretch:80%;font-weight:800;font-size:20px;text-transform:uppercase;letter-spacing:.01em}
+.check .sub{color:var(--ink-3);font-size:12px;margin-bottom:10px}
+.check .big{font-family:var(--f-display);font-stretch:75%;font-weight:850;font-size:44px;line-height:1;font-variant-numeric:tabular-nums}
+.check .cmp{font-size:12.5px;color:var(--ink-2);margin:4px 0 10px}
+.check .cmp b{color:var(--ink)}
+.check ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.check li{display:grid;grid-template-columns:10px 1fr auto;gap:8px;align-items:center;font-size:12.5px}
+.check li i{width:10px;height:10px;border-radius:50%}
+.check li span:last-child{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-2)}
+.check .close{position:absolute;top:8px;right:10px;border:0;background:none;color:var(--ink-3);font-size:18px;cursor:pointer;line-height:1}
+.radius{display:flex;gap:6px;margin-bottom:10px}
+.radius button{border:1px solid var(--line);background:var(--chip);color:var(--ink-2);border-radius:999px;padding:3px 9px;font:600 11.5px var(--f-body);cursor:pointer}
+.radius button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.toast{left:50%;transform:translateX(-50%);top:calc(14px + env(safe-area-inset-top,0px));padding:7px 14px;font:600 12.5px var(--f-body);pointer-events:none;transition:opacity .3s}
+.tip{position:fixed;z-index:1000;pointer-events:none;background:var(--ink);color:var(--panel);font:500 12px var(--f-body);padding:6px 9px;border-radius:6px;white-space:nowrap;transform:translate(-50%,calc(-100% - 10px))}
+.tip b{font-family:var(--f-mono)}
+/* leaflet theming */
+.leaflet-container{background:var(--mapbg);font-family:var(--f-body)}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--panel);color:var(--ink);box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.leaflet-popup-content{margin:12px 14px;font-size:13px;line-height:1.4}
+.pop .k{font-family:var(--f-mono);font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em}
+.pop .t{font-weight:700;font-size:14px;margin:2px 0}
+.pin{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#fff;font:700 10px var(--f-mono);border:2px solid var(--panel);box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.cluster{border-radius:50%;display:grid;place-items:center;color:var(--accent-ink);background:var(--accent);font:700 12px var(--f-mono);border:3px solid color-mix(in srgb,var(--accent) 35%,transparent);background-clip:padding-box}
+.vlabel{font-family:var(--f-display);font-stretch:75%;font-weight:750;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);text-shadow:0 0 3px var(--mapbg),0 0 3px var(--mapbg),0 0 6px var(--mapbg);white-space:nowrap;background:none;border:0}
+.leaflet-control-zoom a{background:var(--panel)!important;color:var(--ink)!important;border-color:var(--line)!important}
+.leaflet-control-attribution{background:color-mix(in srgb,var(--panel) 80%,transparent)!important;color:var(--ink-3)!important}
+.leaflet-control-attribution a{color:var(--ink-2)!important}
+@media (max-width:820px){
+  .app{grid-template-columns:1fr;grid-template-rows:auto;height:auto}
+  .stage{height:68vh;order:-1}
+  .rail{border-right:0;padding-right:max(16px,env(safe-area-inset-right,0px));padding-left:max(16px,env(safe-area-inset-left,0px))}
+  h1{font-size:34px}
+  .check{left:14px;right:14px;width:auto;bottom:14px}
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="app">
+  <aside class="rail" aria-label="Filters and summaries">
+    <header>
+      <div class="eyebrow"><span class="beacon" aria-hidden="true"></span><span id="eyebrow">Newton, Massachusetts · Police logs</span></div>
+      <h1>Newton Crime Map</h1>
+      <p class="lede" id="lede">Crimes reported to the Newton Police Department, placed on the map by block. Filter by type, week and time of day, or click anywhere on the map to check a spot.</p>
+    </header>
+
+    <section class="stats" aria-label="Summary for current filters">
+      <div class="stat"><b id="sTotal">0</b><span>Incidents</span></div>
+      <div class="stat"><b id="sTop" class="sm">–</b><span>Top type</span></div>
+      <div class="stat"><b id="sVil" class="sm">–</b><span>Busiest area</span></div>
+    </section>
+
+    <section>
+      <h2>Map view</h2>
+      <div class="seg" role="group" aria-label="Map view">
+        <button id="vHeat" aria-pressed="true">Heatmap</button>
+        <button id="vCluster" aria-pressed="false">Clusters</button>
+        <button id="vPins" aria-pressed="false">Every pin</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Crime type <small>tap to show or hide</small></h2>
+      <div class="chips" id="chips"></div>
+      <div class="row-actions"><button class="link" id="allCats">Show all</button><button class="link" id="noFraud">Hide fraud &amp; scams</button></div>
+    </section>
+
+    <section>
+      <h2>Time of day <small id="hourNote">all hours</small></h2>
+      <div class="seg" role="group" aria-label="Time of day" id="dayparts">
+        <button data-p="all" aria-pressed="true">All</button>
+        <button data-p="morning" aria-pressed="false">6a–12p</button>
+        <button data-p="afternoon" aria-pressed="false">12–6p</button>
+        <button data-p="evening" aria-pressed="false">6p–12a</button>
+        <button data-p="night" aria-pressed="false">12–6a</button>
+      </div>
+      <svg class="chart" id="hourChart" viewBox="0 0 360 86" role="img" aria-label="Incidents by hour of day"></svg>
+    </section>
+
+    <section>
+      <h2><span class="weekhead">By week <button class="play" id="play" aria-label="Play weeks"><svg viewBox="0 0 10 10"><path d="M1 0l9 5-9 5z"/></svg><span>Play</span></button></span><small id="weekNote">all weeks</small></h2>
+      <svg class="chart" id="weekChart" viewBox="0 0 360 110" role="img" aria-label="Incidents per week"></svg>
+    </section>
+
+    <section>
+      <h2>By village <small>tap to zoom</small></h2>
+      <div class="villages" id="villages"></div>
+    </section>
+
+    <section>
+      <h2>Latest in view <small id="feedNote"></small></h2>
+      <div class="feed" id="feed"></div>
+    </section>
+
+    <section class="note">
+      <p><strong>Where this comes from.</strong> <span id="srcNote"></span> Each entry is a call the police logged, not a confirmed conviction. Locations are rounded to the block.</p>
+      <p>Fraud and scam reports are usually filed from the victim's home, so they mark where people live more than where crime happens. Shopping areas like Chestnut Hill and Needham Street show more theft because that's where the stores are.</p>
+      <p>If you share this with clients as a realtor, present it as public police data and let them draw their own conclusions. Fair housing rules discourage steering buyers toward or away from neighborhoods.</p>
+    </section>
+  </aside>
+
+  <main class="stage">
+    <div id="map" aria-label="Map of Newton with crime locations"></div>
+    <div class="overlay hint"><span>Click the map to check any spot</span><kbd>click</kbd></div>
+    <div class="overlay check" id="check" hidden>
+      <button class="close" id="checkClose" aria-label="Close">×</button>
+      <h3 id="cTitle">This spot</h3>
+      <div class="sub" id="cSub"></div>
+      <div class="radius" role="group" aria-label="Radius">
+        <button data-r="0.125" aria-pressed="false">⅛ mi</button>
+        <button data-r="0.25" aria-pressed="true">¼ mi</button>
+        <button data-r="0.5" aria-pressed="false">½ mi</button>
+      </div>
+      <div class="big" id="cBig">0</div>
+      <div class="cmp" id="cCmp"></div>
+      <ul id="cList"></ul>
+    </div>
+  </main>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
+<script>
+const DATA = /*__DATA__*/null;
+const BOUNDARY = /*__BOUNDARY__*/null;
+const CATS = [
+  ['Theft','T'],['Car crime','C'],['Burglary','B'],['Fraud & scams','F'],
+  ['Vandalism','V'],['Assault & fights','A'],['Harassment','H'],['Trespass & drugs','D']];
+const VILLAGES = {'Auburndale':[42.3456,-71.2470],'Chestnut Hill':[42.3230,-71.1700],'Newton Centre':[42.3297,-71.1923],'Newton Corner':[42.3519,-71.1834],
+'Newton Highlands':[42.3220,-71.2063],'Lower Falls':[42.3329,-71.2530],'Upper Falls':[42.3125,-71.2215],'Newtonville':[42.3507,-71.2084],
+'Nonantum':[42.3627,-71.1990],'Oak Hill':[42.3080,-71.1820],'Thompsonville':[42.3170,-71.1880],'Waban':[42.3268,-71.2300],'West Newton':[42.3490,-71.2270]};
+const $ = s => document.querySelector(s);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const catColor = c => css('--c' + (CATS.findIndex(x => x[0] === c) + 1));
+const catLetter = c => (CATS.find(x => x[0] === c) || ['', '?'])[1];
+const esc = s => String(s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+
+const rows = DATA.incidents.map(r => {
+  const dt = new Date(r.d + 'T00:00:00');
+  const ws = new Date(dt); ws.setDate(dt.getDate() - dt.getDay());
+  return {...r, dt, wk: ws.toISOString().slice(0, 10)};
+});
+const weeks = [...new Set(rows.map(r => r.wk))].sort();
+const fmtD = d => d.toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
+const fmtWk = w => fmtD(new Date(w + 'T00:00:00'));
+const fmtT = (h, m) => { const ap = h < 12 ? 'am' : 'pm'; const hh = h % 12 || 12; return `${hh}:${String(m).padStart(2, '0')}${ap}`; };
+
+const first = rows[0].dt, last = rows[rows.length - 1].dt;
+$('#srcNote').innerHTML = `${esc(DATA.source)}: ${DATA.weeks} weekly logs from ${fmtD(first)} to ${fmtD(last)}, ${last.getFullYear()}, with ${rows.length} crime reports. Medical calls, alarms, car crashes and routine patrols are left out.`;
+$('#eyebrow').textContent = `Newton, MA · ${DATA.weeks} weeks of police logs · ${first.getFullYear()}`;
+
+const state = { cats: new Set(CATS.map(c => c[0])), part: 'all', weeks: null, view: 'heat', check: null, radius: 0.25 };
+try { const s = JSON.parse(localStorage.getItem('ncm-prefs') || '{}'); if (s.view) state.view = s.view; if (Array.isArray(s.cats)) state.cats = new Set(s.cats); } catch (e) {}
+const savePrefs = () => { try { localStorage.setItem('ncm-prefs', JSON.stringify({view: state.view, cats: [...state.cats]})); } catch (e) {} };
+
+const PARTS = {all: [0, 24], morning: [6, 12], afternoon: [12, 18], evening: [18, 24], night: [0, 6]};
+const inPart = h => { const [a, b] = PARTS[state.part]; return h >= a && h < b; };
+const baseFilter = (r, skip) => (skip === 'cat' || state.cats.has(r.c)) && (skip === 'part' || inPart(r.h)) && (skip === 'week' || !state.weeks || state.weeks.has(r.wk));
+const filtered = () => rows.filter(r => baseFilter(r));
+
+/* ---------- map ---------- */
+const map = L.map('map', {zoomControl: true, attributionControl: true, preferCanvas: true}).setView([42.3355, -71.2092], 13);
+const isDark = () => { const t = document.documentElement.getAttribute('data-theme'); return t ? t === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; };
+let tiles;
+function setTiles() {
+  if (tiles) map.removeLayer(tiles);
+  tiles = L.tileLayer(`https://{s}.basemaps.cartocdn.com/${isDark() ? 'dark_all' : 'light_all'}/{z}/{x}/{y}{r}.png`, {
+    subdomains: 'abcd', maxZoom: 19, attribution: '&copy; OpenStreetMap contributors &copy; CARTO'}).addTo(map);
+  tiles.bringToBack();
+}
+setTiles();
+let boundary;
+function drawBoundary() {
+  if (boundary) map.removeLayer(boundary);
+  boundary = L.geoJSON(BOUNDARY, {interactive: false, style: {color: css('--boundary'), weight: 2.5, dashArray: '6 5', fill: true, fillColor: css('--boundary'), fillOpacity: .04}}).addTo(map);
+}
+drawBoundary();
+map.fitBounds(boundary.getBounds(), {padding: [20, 20]});
+Object.entries(VILLAGES).forEach(([n, ll]) => L.marker(ll, {interactive: false, icon: L.divIcon({className: 'vlabel', html: n, iconSize: null})}).addTo(map));
+
+let layer = null;
+const pinIcon = r => L.divIcon({className: '', html: `<div class="pin" style="background:${catColor(r.c)}">${catLetter(r.c)}</div>`, iconSize: [22, 22], iconAnchor: [11, 11]});
+const popup = r => `<div class="pop"><div class="k">${esc(r.c)}</div><div class="t">${esc(r.t)}</div><div>${esc(r.loc)}</div><div class="k" style="margin-top:4px">${fmtD(r.dt)}, ${r.dt.getFullYear()} · ${fmtT(r.h, r.m)} · ${esc(r.v)}</div></div>`;
+const jitter = (r, i) => [r.lat + ((i * 37) % 11 - 5) * 0.00004, r.lon + ((i * 53) % 11 - 5) * 0.00005];
+function drawLayer(list) {
+  if (layer) map.removeLayer(layer);
+  if (state.view === 'heat') {
+    const max = Math.max(3, list.length / 120);
+    layer = L.heatLayer(list.map(r => [r.lat, r.lon, 1]), {radius: 24, blur: 20, maxZoom: 15, max,
+      gradient: isDark() ? {0.2: '#1e3a8a', 0.45: '#3b82f6', 0.65: '#facc15', 0.85: '#f97316', 1: '#ef4444'} : {0.2: '#93c5fd', 0.45: '#3b82f6', 0.65: '#eab308', 0.85: '#f97316', 1: '#dc2626'}});
+  } else if (state.view === 'cluster') {
+    layer = L.markerClusterGroup({showCoverageOnHover: false, maxClusterRadius: 50,
+      iconCreateFunction: c => { const n = c.getChildCount(); const s = n < 10 ? 32 : n < 50 ? 40 : 50; return L.divIcon({className: '', html: `<div class="cluster" style="width:${s}px;height:${s}px">${n}</div>`, iconSize: [s, s]}); }});
+    list.forEach(r => layer.addLayer(L.marker([r.lat, r.lon], {icon: pinIcon(r)}).bindPopup(popup(r))));
+  } else {
+    layer = L.layerGroup(list.map((r, i) => L.marker(jitter(r, i), {icon: pinIcon(r)}).bindPopup(popup(r))));
+  }
+  layer.addTo(map);
+}
+
+/* ---------- check-a-spot ---------- */
+let checkLayer = null;
+const miles = (a, b, c, d) => { const R = 3958.8, t = Math.PI / 180; const x = (d - b) * t * Math.cos((a + c) / 2 * t), y = (c - a) * t; return R * Math.hypot(x, y); };
+const AREA_SQMI = 18.2;
+function renderCheck(list) {
+  if (checkLayer) { map.removeLayer(checkLayer); checkLayer = null; }
+  if (!state.check) { $('#check').hidden = true; return; }
+  const {lat, lng} = state.check, rad = state.radius;
+  checkLayer = L.layerGroup([
+    L.circle([lat, lng], {radius: rad * 1609.34, color: css('--accent'), weight: 2, fillColor: css('--accent'), fillOpacity: .08, interactive: false}),
+    L.circleMarker([lat, lng], {radius: 6, color: css('--panel'), weight: 2, fillColor: css('--accent'), fillOpacity: 1, interactive: false})]).addTo(map);
+  const near = list.filter(r => miles(lat, lng, r.lat, r.lon) <= rad);
+  const expected = list.length * (Math.PI * rad * rad) / AREA_SQMI;
+  const ratio = expected ? near.length / expected : 0;
+  $('#check').hidden = false;
+  $('#cBig').textContent = near.length;
+  const vill = Object.entries(VILLAGES).sort((a, b) => miles(lat, lng, ...a[1]) - miles(lat, lng, ...b[1]))[0][0];
+  $('#cTitle').textContent = 'Near ' + vill;
+  $('#cSub').textContent = `Incidents within ${rad} mile, using the filters on the left`;
+  const word = near.length === 0 ? 'No incidents here for these filters.' : ratio < 0.6 ? `<b>Quieter</b> than the Newton average for an area this size.` : ratio < 1.4 ? `<b>About average</b> for an area this size in Newton.` : `<b>${ratio.toFixed(1)}× the Newton average</b> for an area this size.`;
+  $('#cCmp').innerHTML = word;
+  const by = {}; near.forEach(r => by[r.c] = (by[r.c] || 0) + 1);
+  $('#cList').innerHTML = CATS.filter(c => by[c[0]]).sort((a, b) => by[b[0]] - by[a[0]]).map(c => `<li><i style="background:${catColor(c[0])}"></i><span>${esc(c[0])}</span><span>${by[c[0]]}</span></li>`).join('');
+}
+map.on('click', e => { state.check = e.latlng; renderCheck(filtered()); });
+$('#checkClose').onclick = () => { state.check = null; renderCheck([]); };
+document.querySelectorAll('.radius button').forEach(b => b.onclick = () => {
+  state.radius = +b.dataset.r; document.querySelectorAll('.radius button').forEach(x => x.setAttribute('aria-pressed', x === b)); renderCheck(filtered()); });
+
+/* ---------- tooltip ---------- */
+const tip = $('#tip');
+const showTip = (e, html) => { tip.innerHTML = html; tip.hidden = false; tip.style.left = e.clientX + 'px'; tip.style.top = e.clientY + 'px'; };
+const hideTip = () => tip.hidden = true;
+
+/* ---------- side panels ---------- */
+function renderChips() {
+  const counts = {}; rows.filter(r => baseFilter(r, 'cat')).forEach(r => counts[r.c] = (counts[r.c] || 0) + 1);
+  $('#chips').innerHTML = CATS.map(([c, l], i) => `<button class="chip" data-c="${esc(c)}" aria-pressed="${state.cats.has(c)}"><span class="dot" style="background:var(--c${i + 1})">${l}</span><span class="nm">${esc(c)}</span><span class="n">${counts[c] || 0}</span></button>`).join('');
+  document.querySelectorAll('.chip').forEach(b => b.onclick = () => { const c = b.dataset.c; state.cats.has(c) ? state.cats.delete(c) : state.cats.add(c); savePrefs(); update(); });
+}
+const SVGNS = 'http://www.w3.org/2000/svg';
+function el(tag, attrs, parent) { const e = document.createElementNS(SVGNS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent && parent.appendChild(e); return e; }
+function niceMax(v) { if (v <= 5) return 5; const p = Math.pow(10, Math.floor(Math.log10(v))); for (const m of [1, 2, 2.5, 5, 10]) if (m * p >= v) return m * p; return v; }
+
+function renderHours() {
+  const svg = $('#hourChart'); svg.innerHTML = '';
+  const c = new Array(24).fill(0); rows.filter(r => baseFilter(r, 'part')).forEach(r => c[r.h]++);
+  const W = 360, H = 86, top = 6, bot = 18, left = 2, bw = (W - left) / 24, max = niceMax(Math.max(...c));
+  el('line', {x1: 0, x2: W, y1: H - bot + .5, y2: H - bot + .5, stroke: css('--line'), 'stroke-width': 1}, svg);
+  c.forEach((v, h) => {
+    const bh = (H - top - bot) * v / max, x = left + h * bw + 1, y = H - bot - bh;
+    const on = inPart(h);
+    const g = el('g', {class: 'bar'}, svg);
+    el('rect', {x: x - 1, y: top, width: bw, height: H - top - bot, fill: 'transparent'}, g);
+    if (v) el('path', {d: `M${x},${H - bot} V${y + Math.min(3, bh)} q0,-3 3,-3 h${bw - 8} q3,0 3,3 V${H - bot} Z`, fill: on ? css('--accent') : css('--line')}, g);
+    g.addEventListener('mousemove', e => showTip(e, `${fmtT(h, 0)}–${fmtT((h + 1) % 24, 0)} · <b>${v}</b>`));
+    g.addEventListener('mouseleave', hideTip);
+  });
+  [[0, '12a'], [6, '6a'], [12, '12p'], [18, '6p'], [23, '11p']].forEach(([h, t]) => el('text', {x: left + h * bw + bw / 2, y: H - 4, 'text-anchor': 'middle'}, svg).textContent = t);
+  const pk = c.indexOf(Math.max(...c));
+  $('#hourNote').textContent = `busiest around ${fmtT(pk, 0)}`;
+}
+
+function renderWeeks() {
+  const svg = $('#weekChart'); svg.innerHTML = '';
+  const c = weeks.map(w => rows.filter(r => r.wk === w && baseFilter(r, 'week')).length);
+  const W = 360, H = 110, top = 14, bot = 20, left = 26, n = weeks.length, gap = 3, bw = (W - left - gap * (n - 1)) / n, max = niceMax(Math.max(...c, 1));
+  [0, max / 2, max].forEach(v => { const y = H - bot - (H - top - bot) * v / max; el('line', {x1: left, x2: W, y1: y + .5, y2: y + .5, stroke: css('--line'), 'stroke-width': 1, 'stroke-dasharray': v ? '2 3' : ''}, svg); el('text', {x: left - 5, y: y + 3.5, 'text-anchor': 'end'}, svg).textContent = v; });
+  c.forEach((v, i) => {
+    const w = weeks[i], bh = (H - top - bot) * v / max, x = left + i * (bw + gap), y = H - bot - bh;
+    const on = !state.weeks || state.weeks.has(w);
+    const g = el('g', {class: 'bar', tabindex: 0, role: 'button', 'aria-label': `Week of ${fmtWk(w)}, ${v} incidents`}, svg);
+    el('rect', {x, y: top, width: bw, height: H - top - bot, fill: 'transparent'}, g);
+    if (v) el('path', {d: `M${x},${H - bot} V${y + Math.min(4, bh)} q0,-4 4,-4 h${bw - 8} q4,0 4,4 V${H - bot} Z`, fill: on ? css('--accent') : css('--line')}, g);
+    const pick = () => { if (playing) stopPlay(); if (state.weeks && state.weeks.size === 1 && state.weeks.has(w)) state.weeks = null; else state.weeks = new Set([w]); update(); };
+    g.addEventListener('click', pick); g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+    g.addEventListener('mousemove', e => showTip(e, `Week of ${fmtWk(w)} · <b>${v}</b>`)); g.addEventListener('mouseleave', hideTip);
+  });
+  [0, Math.floor((n - 1) / 2), n - 1].forEach(i => el('text', {x: left + i * (bw + gap) + bw / 2, y: H - 5, 'text-anchor': i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle'}, svg).textContent = fmtWk(weeks[i]));
+  $('#weekNote').innerHTML = state.weeks ? `week of ${fmtWk([...state.weeks][0])} · <button class="link" id="wkAll">all weeks</button>` : 'tap a week to isolate it';
+  const wa = $('#wkAll'); if (wa) wa.onclick = () => { stopPlay(); state.weeks = null; update(); };
+}
+
+function renderVillages(list) {
+  const by = {}; Object.keys(VILLAGES).forEach(v => by[v] = 0); list.forEach(r => by[r.v]++);
+  const sorted = Object.entries(by).sort((a, b) => b[1] - a[1]), max = Math.max(1, sorted[0][1]);
+  $('#villages').innerHTML = sorted.map(([v, n]) => `<button class="vrow" data-v="${esc(v)}"><span>${esc(v)}</span><span class="track"><span class="fill" style="display:block;width:${n / max * 100}%"></span></span><span class="n">${n}</span></button>`).join('');
+  document.querySelectorAll('.vrow').forEach(b => b.onclick = () => { map.flyTo(VILLAGES[b.dataset.v], 15, {duration: .8}); });
+  return sorted[0];
+}
+
+function renderFeed(list) {
+  const b = map.getBounds();
+  const inView = list.filter(r => b.contains([r.lat, r.lon]));
+  const show = inView.slice(-40).reverse();
+  $('#feedNote').textContent = `${inView.length} on screen`;
+  $('#feed').innerHTML = show.length ? show.map((r, i) => `<button class="inc" data-i="${rows.indexOf(r)}"><span class="dot" style="background:${catColor(r.c)}"></span><span class="t">${esc(r.t)}</span><span class="meta">${fmtD(r.dt)} · ${fmtT(r.h, r.m)} · ${esc(r.loc)}</span></button>`).join('') : '<p style="color:var(--ink-3);font-size:12.5px">Nothing on screen for these filters. Zoom out or turn more types on.</p>';
+  document.querySelectorAll('.inc').forEach(el => el.onclick = () => { const r = rows[+el.dataset.i]; map.flyTo([r.lat, r.lon], 17, {duration: .7}); L.popup().setLatLng([r.lat, r.lon]).setContent(popup(r)).openOn(map); });
+}
+
+function update() {
+  const list = filtered();
+  renderChips(); renderHours(); renderWeeks();
+  const topV = renderVillages(list);
+  const bc = {}; list.forEach(r => bc[r.c] = (bc[r.c] || 0) + 1);
+  const topC = Object.entries(bc).sort((a, b) => b[1] - a[1])[0];
+  $('#sTotal').textContent = list.length;
+  $('#sTop').textContent = topC ? topC[0].replace(/ & .*/, '') : '–';
+  $('#sTop').title = topC ? topC[0] : '';
+  $('#sVil').textContent = list.length ? topV[0] : '–';
+  document.querySelectorAll('#dayparts button').forEach(b => b.setAttribute('aria-pressed', b.dataset.p === state.part));
+  ['heat', 'cluster', 'pins'].forEach(v => $('#v' + {heat: 'Heat', cluster: 'Cluster', pins: 'Pins'}[v]).setAttribute('aria-pressed', state.view === v));
+  drawLayer(list); renderFeed(list); renderCheck(list);
+}
+map.on('moveend', () => renderFeed(filtered()));
+
+$('#vHeat').onclick = () => { state.view = 'heat'; savePrefs(); update(); };
+$('#vCluster').onclick = () => { state.view = 'cluster'; savePrefs(); update(); };
+$('#vPins').onclick = () => { state.view = 'pins'; savePrefs(); update(); };
+document.querySelectorAll('#dayparts button').forEach(b => b.onclick = () => { state.part = b.dataset.p; update(); });
+$('#allCats').onclick = () => { state.cats = new Set(CATS.map(c => c[0])); savePrefs(); update(); };
+$('#noFraud').onclick = () => { state.cats.delete('Fraud & scams'); savePrefs(); update(); };
+
+/* ---------- playback ---------- */
+let playing = null, pi = 0;
+function stopPlay() { if (playing) clearInterval(playing); playing = null; $('#play span').textContent = 'Play'; $('#play svg').innerHTML = '<path d="M1 0l9 5-9 5z"/>'; }
+$('#play').onclick = () => {
+  if (playing) { stopPlay(); state.weeks = null; update(); return; }
+  pi = 0; $('#play span').textContent = 'Stop'; $('#play svg').innerHTML = '<rect x="1" y="1" width="8" height="8"/>';
+  const step = () => { if (pi >= weeks.length) { stopPlay(); state.weeks = null; update(); return; } state.weeks = new Set([weeks[pi++]]); update(); };
+  step(); playing = setInterval(step, 1100);
+};
+
+/* theme changes */
+const retheme = () => { setTiles(); drawBoundary(); update(); };
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', retheme);
+new MutationObserver(retheme).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+
+update();
+</script>
